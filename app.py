@@ -439,5 +439,10 @@ def download_extension():
         return jsonify({"error": f"Error creating extension zip: {str(e)}"}), 500
 
 if __name__ == '__main__':
+    # Only run the built-in server when executed directly, not when imported by Passenger
     init_db() # Initialize DB schema
     app.run(host='0.0.0.0', port=7000, debug=False)
+else:
+    # When imported by Passenger, just initialize the database
+    with app.app_context():
+        init_db()
