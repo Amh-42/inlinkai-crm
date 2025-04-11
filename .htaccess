@@ -1,24 +1,42 @@
 PassengerEnabled On
 PassengerAppType wsgi
-PassengerAppRoot /home/username/public_html/3rm
-PassengerPython /usr/bin/python3
+PassengerAppRoot /home/inlinkff/3rm.inlinkai.com
+PassengerPython python3
 PassengerStartupFile passenger_wsgi.py
 
 # Protect SQLite database
-<Files "linkedin_crm/backend/*.db">
+<Files ~ "\.db$">
   Order allow,deny
   Deny from all
 </Files>
 
-# Protect Python scripts in directories
-<FilesMatch "linkedin_crm/backend/.*\.py$">
+# Don't show directories
+Options -Indexes
+
+# Allow direct access to static assets
+<FilesMatch "\.(jpg|jpeg|png|gif|css|js|ico)$">
   Order allow,deny
-  Deny from all
+  Allow from all
 </FilesMatch>
 
 # If you're using HTTPS
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  
+  # Force HTTPS
   RewriteCond %{HTTPS} off
   RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  
+  # Remove trailing slashes
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)/$ /$1 [L,R=301]
+  
+  # Serve existing files directly
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+  
+  # Redirect all other requests to the Flask app
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ /passenger_wsgi.py [L]
 </IfModule>
