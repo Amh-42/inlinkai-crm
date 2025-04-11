@@ -9,14 +9,33 @@ import shutil
 import tempfile
 
 # Change the template folder to point to the backend/templates directory
-template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_crm/backend/templates')
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'linkedin_crm/backend/templates'))
+if not os.path.exists(template_dir):
+    # Alternative path for cPanel structure
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend/templates'))
+    if os.path.exists(template_dir):
+        print(f"Using alternative template path: {template_dir}")
+    else:
+        print(f"Warning: Template directory not found at {template_dir}")
+
 app = Flask(__name__, template_folder=template_dir)
 # Allow requests from the Chrome extension's origin
 # CORS(app, resources={r"/api/*": {"origins": "chrome-extension://*"}}) # Original line
 CORS(app) # Allow all origins for debugging
 
-# Set the database path to the backend directory
-DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_crm/backend/database.db')
+# Set the database path
+db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'linkedin_crm/backend/database.db'))
+if not os.path.exists(os.path.dirname(db_path)):
+    # Try alternative path for cPanel structure
+    alt_db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend/database.db'))
+    if os.path.exists(os.path.dirname(alt_db_path)):
+        db_path = alt_db_path
+        print(f"Using alternative database path: {db_path}")
+    else:
+        print(f"Warning: Neither database directory exists. Will attempt to create.")
+
+DATABASE = db_path
+print(f"Database path set to: {DATABASE}")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -396,17 +415,29 @@ def save_profile():
 @app.route('/download-extension')
 def download_extension():
     """Create a zip file of the extension directory and send it for download."""
+    # Try primary extension path
     extension_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_crm/extension')
+    if not os.path.exists(extension_dir):
+        # Try alternative path
+        alt_extension_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'extension')
+        if os.path.exists(alt_extension_dir):
+            extension_dir = alt_extension_dir
+            print(f"Using alternative extension path: {extension_dir}")
+        else:
+            return jsonify({"error": "Extension directory not found"}), 404
     
     # Create a temporary directory
     temp_dir = tempfile.mkdtemp()
     zip_path = os.path.join(temp_dir, 'linkedin_crm_extension.zip')
     
-    # Create a zip file of the extension directory
-    shutil.make_archive(os.path.splitext(zip_path)[0], 'zip', extension_dir)
-    
-    return send_file(zip_path, as_attachment=True, download_name='linkedin_crm_extension.zip')
+    try:
+        # Create a zip file of the extension directory
+        shutil.make_archive(os.path.splitext(zip_path)[0], 'zip', extension_dir)
+        return send_file(zip_path, as_attachment=True, download_name='linkedin_crm_extension.zip')
+    except Exception as e:
+        print(f"Error creating extension zip: {e}")
+        return jsonify({"error": f"Error creating extension zip: {str(e)}"}), 500
 
 if __name__ == '__main__':
     init_db() # Initialize DB schema
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=7000, debug=False)
