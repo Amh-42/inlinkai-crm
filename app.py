@@ -21,9 +21,28 @@ DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_cr
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-        db.row_factory = sqlite3.Row
-        db.execute("PRAGMA foreign_keys = ON") # Enforce foreign key constraints
+        # Ensure the directory exists
+        db_dir = os.path.dirname(DATABASE)
+        if not os.path.exists(db_dir):
+            try:
+                os.makedirs(db_dir, exist_ok=True)
+                print(f"Created database directory: {db_dir}")
+            except Exception as e:
+                print(f"Error creating database directory: {e}")
+        
+        # Try to connect to the database
+        try:
+            db = g._database = sqlite3.connect(DATABASE)
+            db.row_factory = sqlite3.Row
+            db.execute("PRAGMA foreign_keys = ON") # Enforce foreign key constraints
+            print(f"Successfully connected to database at: {DATABASE}")
+        except Exception as e:
+            print(f"Database connection error: {e}")
+            # Fallback to in-memory database if file database fails
+            print("Falling back to in-memory database")
+            db = g._database = sqlite3.connect(':memory:')
+            db.row_factory = sqlite3.Row
+            db.execute("PRAGMA foreign_keys = ON")
     return db
 
 @app.teardown_appcontext
