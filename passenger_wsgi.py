@@ -1,13 +1,14 @@
-import os
-import sys
+import sys, os
+import importlib.util
 
+# Add the application directory to the Python path
+INTERP = "/usr/bin/python3"
+if sys.executable != INTERP:
+    os.execl(INTERP, INTERP, *sys.argv)
 
-sys.path.insert(0, os.path.dirname(__file__))
+# Path to your app
+app_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, app_dir)
 
-
-def application(environ, start_response):
-    start_response('200 OK', [('Content-Type', 'text/plain')])
-    message = 'It works!\n'
-    version = 'Python %s\n' % sys.version.split()[0]
-    response = '\n'.join([message, version])
-    return [response.encode()]
+# Import your Flask app from the root directory
+from app import app as application
