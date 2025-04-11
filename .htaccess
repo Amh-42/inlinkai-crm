@@ -1,0 +1,24 @@
+PassengerEnabled On
+PassengerAppType wsgi
+PassengerAppRoot /home/username/public_html/3rm
+PassengerPython /usr/bin/python3
+PassengerStartupFile passenger_wsgi.py
+
+# Protect SQLite database
+<Files "*.db">
+  Order allow,deny
+  Deny from all
+</Files>
+
+# Protect Python scripts except app.py
+<FilesMatch "^(?!app\.py).*\.py$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# If you're using HTTPS
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule> 
