@@ -301,7 +301,7 @@ async function scrapeProfileData() {
 
     // --- Send Data ---
     console.log("Scraping finished. Sending data to backend...");
-    const apiUrl = 'https://3rm3.inlinkai.com/api/save_profile';
+    const apiUrl = 'https://3rm.inlinkai.com/api/save_profile';
 
     try {
         const response = await fetch(apiUrl, {
