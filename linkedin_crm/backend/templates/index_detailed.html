@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn CRM - Profile Details</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #191919; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .back-button { display: inline-block; background: #0073b1; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; margin-bottom: 20px; }
+        .back-button:hover { background: #005b8b; }
+        .profile-card { border: 1px solid #ddd; margin-bottom: 25px; border-radius: 8px; overflow: hidden; background: #fff; }
+        .profile-header { position: relative; }
+        .banner-img { width: 100%; height: 150px; object-fit: cover; display: block; background-color: #e1e9ee; }
+        .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #fff; position: absolute; bottom: -60px; left: 30px; object-fit: cover; background-color: #ccc; }
+        .profile-info { padding: 80px 30px 20px 30px; }
+        .profile-info h2 { margin-top: 0; margin-bottom: 5px; font-size: 1.8em; }
+        .profile-info p { margin: 4px 0; color: #555; }
+        .profile-info .headline { font-size: 1.1em; color: #191919; margin-bottom: 10px; }
+        .profile-info .location { font-size: 0.95em; color: #777; margin-bottom: 15px; }
+        .contact-info span { margin-right: 15px; font-size: 0.9em; }
+        .contact-info a { color: #0073b1; text-decoration: none; }
+        .contact-info a:hover { text-decoration: underline; }
+
+        .section { padding: 20px 30px; border-top: 1px solid #eee; }
+        .section h3 { margin-top: 0; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
+        .section pre { white-space: pre-wrap; word-wrap: break-word; background: #f9f9f9; padding: 15px; border-radius: 4px; font-size: 0.95em; max-height: 300px; overflow-y: auto; border: 1px solid #eee; }
+        .list-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
+        .list-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .list-item h4 { margin: 0 0 5px 0; font-size: 1.1em; }
+        .list-item .sub-heading { font-size: 1em; color: #555; margin-bottom: 5px; }
+        .list-item .dates, .list-item .location-sub { font-size: 0.9em; color: #777; margin-bottom: 8px; }
+        .list-item p { font-size: 0.95em; margin: 5px 0; }
+        .list-item ul { padding-left: 20px; margin-top: 10px; }
+        .skill-item { display: inline-block; background: #e1e9ee; color: #006097; padding: 5px 10px; margin: 3px; border-radius: 15px; font-size: 0.9em; }
+        .featured-item img { max-width: 100px; max-height: 100px; margin-right: 15px; float: left; }
+        .featured-item::after { content: ""; display: table; clear: both; }
+        .recommendation-item .recommender-info { display: flex; align-items: center; margin-bottom: 10px; }
+        .recommender-info img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
+        .recommender-info div { font-size: 0.9em; }
+        .recommender-info strong { display: block; font-size: 1em; }
+         .error { color: red; background: #ffebeb; border: 1px solid red; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        details > summary { cursor: pointer; color: #0073b1; font-size: 0.9em; margin-top: 15px;}
+        details pre { max-height: 400px;}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LinkedIn CRM</h1>
+        
+        <a href="/" class="back-button">← Back to List</a>
+
+         {% if error %}
+            <p class="error">{{ error }}</p>
+         {% endif %}
+
+        {% if profiles %}
+            {% for profile in profiles %}
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img src="{{ profile['banner_pic_url'] or 'https://via.placeholder.com/900x150/e1e9ee/cccccc?text=+' }}" alt="Banner" class="banner-img">
+                    <img src="{{ profile['profile_pic_url'] or 'https://via.placeholder.com/120/cccccc/ffffff?text=?' }}" alt="Profile Picture" class="profile-pic">
+                </div>
+                <div class="profile-info">
+                    <h2>{{ profile['name'] }}</h2>
+                    <p class="headline">{{ profile['headline'] }}</p>
+                    <p class="location">{{ profile['location'] or 'Location not available' }}</p>
+                    <div class="contact-info">
+                        <span><a href="{{ profile['linkedin_url'] }}" target="_blank">LinkedIn Profile</a></span>
+                         {% if profile['website'] %}<span> | <a href="{{ profile['website'] }}" target="_blank">Website</a></span>{% endif %}
+                         {% if profile['followers'] %}<span> | Followers: {{ profile['followers'] }}</span>{% endif %}
+                         {% if profile['connections'] %}<span> | Connections: {{ profile['connections'] }}</span>{% endif %}
+                    </div>
+                     <p><small>Saved: {{ profile['timestamp'] }}</small></p>
+                </div>
+
+                {% if profile['about'] %}
+                <section class="section">
+                    <h3>About</h3>
+                    <pre>{{ profile['about'] }}</pre>
+                </section>
+                {% endif %}
+
+                {% if profile['featured'] %}
+                <section class="section">
+                    <h3>Featured</h3>
+                    {% for item in profile['featured'] %}
+                    <div class="list-item featured-item">
+                        {% if item['image_url'] %}<img src="{{ item['image_url'] }}" alt="Featured thumbnail">{% endif %}
+                         {% if item['title'] %}<h4>{{ item['title'] }} {% if item['type'] %}<small>({{ item['type'] }})</small>{% endif %}</h4>{% endif %}
+                         {% if item['link'] %}<p><a href="{{ item['link'] }}" target="_blank">{{ item['link'] }}</a></p>{% endif %}
+                         {% if item['description'] %}<p>{{ item['description'] }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+                {% if profile['experience'] %}
+                <section class="section">
+                    <h3>Experience</h3>
+                    {% for exp in profile['experience'] %}
+                     {% if not exp['is_multi_role'] %} {# Only show top-level items or single items #}
+                        <div class="list-item">
+                            <h4>{{ exp['title'] }}</h4>
+                            <p class="sub-heading">
+                                {{ exp['company_name'] }}
+                                {% if exp['employment_type'] %}· {{ exp['employment_type'] }}{% endif %}
+                            </p>
+                            <p class="dates">
+                                {{ exp['start_date'] or '?' }} - {{ exp['end_date'] or '?' }}
+                                {% if exp['duration'] %} ({{ exp['duration'] }}){% endif %}
+                            </p>
+                            {% if exp['location'] %}<p class="location-sub">{{ exp['location'] }}</p>{% endif %}
+                            {% if exp['description'] %}<pre>{{ exp['description'] }}</pre>{% endif %}
+
+                            {# Handle potential sub-roles (less common with new LI structure) #}
+                            {# You might need more complex logic if sub-roles are nested differently #}
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+                {% if profile['education'] %}
+                <section class="section">
+                    <h3>Education</h3>
+                    {% for edu in profile['education'] %}
+                    <div class="list-item">
+                         <h4>{{ edu['school_name'] }}</h4>
+                         <p class="sub-heading">
+                             {% if edu['degree_name'] %}{{ edu['degree_name'] }}{% endif %}
+                             {% if edu['field_of_study'] %}, {{ edu['field_of_study'] }}{% endif %}
+                         </p>
+                         <p class="dates">
+                             {{ edu['start_date'] or '?' }} - {{ edu['end_date'] or '?' }}
+                         </p>
+                         {% if edu['grade'] %}<p>Grade: {{ edu['grade'] }}</p>{% endif %}
+                         {% if edu['activities'] %}<p>Activities: {{ edu['activities'] }}</p>{% endif %}
+                         {% if edu['description'] %}<pre>{{ edu['description'] }}</pre>{% endif %}
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+                 {% if profile['skills'] %}
+                <section class="section">
+                    <h3>Skills</h3>
+                    <div>
+                        {% for skill in profile['skills'] %}
+                        <span class="skill-item">{{ skill['skill_name'] }}</span>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+
+                {% if profile['recommendations'] %}
+                <section class="section">
+                    <h3>Recommendations (Received)</h3>
+                     {% for rec in profile['recommendations'] %}
+                    <div class="list-item recommendation-item">
+                         <div class="recommender-info">
+                             <!-- Placeholder for recommender image if you scrape it -->
+                             <img src="https://via.placeholder.com/40/cccccc/ffffff?text=?" alt="Recommender">
+                             <div>
+                                 <strong>{{ rec['recommender_name'] }}</strong>
+                                 <span>{{ rec['recommender_headline'] }}</span>
+                                 {% if rec['relationship'] %}<br><small>{{ rec['relationship'] }}</small>{% endif %}
+                             </div>
+                         </div>
+                        <pre>{{ rec['recommendation_text'] }}</pre>
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+                <section class="section">
+                     <details>
+                        <summary>View Full HTML Source</summary>
+                        <pre>{{ profile['full_html'] }}</pre>
+                    </details>
+                </section>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No profiles saved yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

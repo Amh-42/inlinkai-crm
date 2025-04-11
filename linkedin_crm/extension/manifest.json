@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Profile Saver (Simple CRM)",
+    "version": "0.1.0",
+    "description": "Saves LinkedIn profile details and full HTML to a local Flask backend.",
+    "permissions": [
+      "activeTab",
+      "scripting"
+    ],
+    "host_permissions": [
+      "*://*.linkedin.com/in/*"
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+      }
+    },
+     "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+      }
+  }
