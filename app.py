@@ -8,12 +8,15 @@ import os
 import shutil
 import tempfile
 
-app = Flask(__name__)
+# Change the template folder to point to the backend/templates directory
+template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_crm/backend/templates')
+app = Flask(__name__, template_folder=template_dir)
 # Allow requests from the Chrome extension's origin
 # CORS(app, resources={r"/api/*": {"origins": "chrome-extension://*"}}) # Original line
 CORS(app) # Allow all origins for debugging
 
-DATABASE = 'database.db'
+# Set the database path to the backend directory
+DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_crm/backend/database.db')
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -374,7 +377,7 @@ def save_profile():
 @app.route('/download-extension')
 def download_extension():
     """Create a zip file of the extension directory and send it for download."""
-    extension_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'extension')
+    extension_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'linkedin_crm/extension')
     
     # Create a temporary directory
     temp_dir = tempfile.mkdtemp()

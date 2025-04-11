@@ -46,7 +46,7 @@ if __name__ == '__main__':
    - Python version: 3.6+
    - Application root: path to your app folder (e.g., `/home/username/public_html/3rm`)
    - Application URL: http://3rm.inlinkai.com
-   - Application startup file: app.py
+   - Application startup file: app.py (now in the root directory)
    - Application Entry point: app
 
 3. Install dependencies:
@@ -65,7 +65,7 @@ PassengerPython /usr/bin/python3
 PassengerStartupFile passenger_wsgi.py
 ```
 
-2. Create a `passenger_wsgi.py` file:
+2. The `passenger_wsgi.py` file is already configured to use the app.py in the root directory:
 
 ```python
 import sys, os
@@ -80,7 +80,7 @@ if sys.executable != INTERP:
 app_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, app_dir)
 
-# Import your Flask app
+# Import your Flask app from the root directory
 from app import app as application
 ```
 
@@ -88,8 +88,8 @@ from app import app as application
 
 1. Since you're using SQLite3, ensure the database file and its directory are writable:
    ```
-   chmod 755 /path/to/your/app/directory
-   chmod 664 /path/to/your/app/database.db
+   chmod 755 /path/to/your/app/linkedin_crm/backend
+   chmod 664 /path/to/your/app/linkedin_crm/backend/database.db
    ```
 
 2. If the database doesn't exist yet, it will be created when the application runs (via `init_db()`)
